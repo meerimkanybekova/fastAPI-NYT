@@ -1,3 +1,4 @@
+# chat_graph.py
 import os
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
@@ -77,7 +78,8 @@ def graph_app_invoke(request_data):
         result = llm.invoke(full_messages)
         content = result.content if hasattr(result, 'content') else str(result)
         save_message("assistant", request_data.user_id, request_data.assistant_name, request_data.thread_id, content)
-        return {"response": content}
+        return {"response": content, "status": "success"}
     except Exception as e:
-        return {"response": f"Сорри, мне надо идти. Поговорим, позже."}
+        return {"response": "⚠️ Ошибка при генерации", "status": "error", "error": str(e)}
+
 
