@@ -68,9 +68,7 @@ def get_groq_response(request_data):
 
     save("user", request_data.user_input)
 
-    # Вызов LangGraph
     result = graph_app_invoke(request_data)
-
 
     assistant_reply = result.get("response", "⚠️ Ошибка в LangGraph")
     save("assistant", assistant_reply)

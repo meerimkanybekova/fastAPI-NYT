@@ -13,7 +13,7 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_MODEL = "llama-3.3-70b-versatile"
 
 llm = ChatGroq(
-    GROQ_MODEL = "llama-3.3-70b-versatile",
+    model=GROQ_MODEL,
     api_key=GROQ_API_KEY,
     temperature=0.9
 )
@@ -66,7 +66,6 @@ def save_message(role, user_id, assistant_name, thread_id, content):
         db.close()
 
 
-# Точка входа для вызова из groq_api.py
 def graph_app_invoke(request_data):
     save_message("user", request_data.user_id, request_data.assistant_name, request_data.thread_id, request_data.user_input)
 

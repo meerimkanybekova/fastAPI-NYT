@@ -10,7 +10,8 @@ langgraph
 langchain
 groq
 langchain_community
-langchain-groq
+langchain_groq
 langchain_core
 
 psycopg2-binary
+psycopg2

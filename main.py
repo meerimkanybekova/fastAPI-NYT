@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request, Query
 from fastapi.responses import JSONResponse
 from database import init_db, SessionLocal
-from groq_api import get_groq_response  # путь к твоему файлу
+from groq_api import get_groq_response 
 from schemas import ChatRequest
 import uvicorn
 
