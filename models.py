@@ -10,6 +10,7 @@ class Message(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(String)
     assistant_name = Column(String)
+    thread_id = Column(String)  # 🆕 добавлено
     role = Column(String)  # 'user' or 'assistant'
     content = Column(String)
     timestamp = Column(DateTime, default=datetime.utcnow)

@@ -39,36 +39,39 @@ def save_message(role, user_id, assistant_name, content):
     finally:
         db.close()
 
+from chat_graph import graph_app_invoke
+
+
 def get_groq_response(request_data):
-    save_message("user", request_data.user_id, request_data.assistant_name, request_data.user_input)
+    from models import Message
+    from database import SessionLocal
+    from sqlalchemy.orm import Session
+    from datetime import datetime
 
-    messages = [
-        {"role": "system", "content": get_prompt(request_data.assistant_name)},
-        {"role": "user", "content": request_data.user_input}
-    ]
+    def save(role, content):
+        db: Session = SessionLocal()
+        try:
+            msg = Message(
+                user_id=request_data.user_id,
+                assistant_name=request_data.assistant_name,
+                role=role,
+                content=content,
+                timestamp=datetime.utcnow()
+            )
+            db.add(msg)
+            db.commit()
+        except Exception as e:
+            print("DB error:", e)
+            db.rollback()
+        finally:
+            db.close()
 
-    headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
-        "Content-Type": "application/json"
-    }
+    save("user", request_data.user_input)
 
-    payload = {
-        "model": GROQ_MODEL,
-        "messages": messages,
-        "stream": False,
-        "temperature": 0.9
-    }
+    # Вызов LangGraph
+    result = graph_app_invoke(request_data)
 
-    try:
-        import requests
-        response = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload)
-        response_json = response.json()
-        print("Full Groq API response:", response_json)
-        if "choices" in response_json and response_json["choices"]:
-            content = response_json["choices"][0]["message"]["content"]
-            save_message("assistant", request_data.user_id, request_data.assistant_name, content)
-            return content
-        else:
-            return f"Error: Unexpected response format: {response_json}"
-    except Exception as e:
-        return f"Error: {str(e)}"
+
+    assistant_reply = result.get("response", "⚠️ Ошибка в LangGraph")
+    save("assistant", assistant_reply)
+    return assistant_reply
